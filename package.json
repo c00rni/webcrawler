@@ -1,0 +1,27 @@
+{
+  "name": "webcrawler",
+  "version": "1.0.0",
+  "description": "A simple webcrawler to map the tree links of website",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js",
+    "test": "node --experimental-vm-modules mode_modules/jest/bin/jest.js"
+  },
+  "jest": {
+    "transform": {}
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/c00rni/webcrawler.git"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/c00rni/webcrawler/issues"
+  },
+  "homepage": "https://github.com/c00rni/webcrawler#readme",
+  "devDependencies": {
+    "@cucumber/cucumber": "^10.8.0",
+    "jest": "^29.7.0"
+  }
+}
