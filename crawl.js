@@ -14,19 +14,17 @@ function normalizeURL(rawUrl) {
 		console.log(`The input: ${rawUrl} failed to normalize: ${err.message}`)
 		return null
 	}
-
-	while (url.pathname.slice(-1) === '/') {
-		url.pathname = url.pathname.slice(0, -1)
+	
+	let res = `${url.protocol}//${url.hostname}${url.pathname}`
+	
+	while (res.slice(-1) === '/') {
+		res = res.slice(0, -1)
 	}
-
-	return `${url.protocol}//${url.hostname}${url.pathname}`
+	return res
 }
 
 function getURLsFromHTML(htmlBody, baseURL) {
 	const dom = new JSDOM(htmlBody, { runScripts: "dangerously" });
-
-	//while baseURL.slice(-1) == '/':
-	//	baseURL = baseURL.slice(0, -1)
 
 	return Array.from(dom.window.document.querySelectorAll('a')).map(node => {
 		node = node.href
@@ -41,22 +39,45 @@ function getURLsFromHTML(htmlBody, baseURL) {
 	})
 }
 
-async function crawlPage(url) {
-	let response
+async function crawlPage(baseURL, currentURL, pages) {
+	if (!currentURL.includes(baseURL)) {
+		return pages
+	}
+	const normalizedCurrentURL = normalizeURL(currentURL)
+	
+	if (pages[normalizedCurrentURL]) {
+		pages[normalizedCurrentURL]++
+		return pages
+	}
+
+	pages[normalizedCurrentURL] = 1
+	const html = await fetchHTML(normalizedCurrentURL)	
+	const urlsFound = getURLsFromHTML(html, baseURL)
+	for (const url of urlsFound) {
+		pages = await crawlPage(baseURL, url, pages)
+	}
+
+	return pages
+}
+
+async function fetchHTML(url) {
 	try {
-		response = await fetch(url)
+		const response = await fetch(url)
+		
+		if (response.status >= 400) {
+			console.error(`Url: ${url} (Reponse code: ${response.status})`)
+			return ""
+		} else if (!response.headers.get("Content-Type").includes("text/html")){
+			console.error(`Url: ${url}. Ressouce is not HTML`)
+			return ""
+		}
+	
+		return await response.text()
+
 	} catch(err) {
-		console.error(`The fetch call fail to reach ${url} with the error: ${err.message}`)
-		return null
+		console.error(`Url: ${url} fetch fail: ${err.message}`)
+		return ""
 	}
 
-	if (response.status >= 400) {
-		console.error(`The ressource at url :${url}, failed to be reach (Reponse code: ${response.status})`)
-		return null
-	} else if (!response.headers.get("Content-Type").includes("text/html")){
-		console.error(`The ressource at url: ${url} couldn't be process. Ressouce is not HTML`)
-		return null
-	}
 
-	console.log(await response.text())
 }

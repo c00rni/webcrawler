@@ -1,5 +1,5 @@
 import { crawlPage } from "./crawl.js";
-function main() {
+async function main() {
 	if (process.argv.length < 3) {
 		console.error('There is not enough arguments.')
 		return 1
@@ -9,7 +9,11 @@ function main() {
 	} else {
 		const url = process.argv[2]
 		console.log('The crawler is starting...')
-		crawlPage(url)
+		const pages = await crawlPage(url,url,{})
+		
+		for (const page of Object.entries(pages)) {
+			console.log(page)
+		}
 	}
 }
 
