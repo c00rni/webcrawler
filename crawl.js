@@ -1,4 +1,4 @@
-export { normalizeURL, getURLsFromHTML };
+export { normalizeURL, getURLsFromHTML, crawlPage };
 import { JSDOM } from 'jsdom'
 
 function normalizeURL(rawUrl) {
@@ -41,3 +41,22 @@ function getURLsFromHTML(htmlBody, baseURL) {
 	})
 }
 
+async function crawlPage(url) {
+	let response
+	try {
+		response = await fetch(url)
+	} catch(err) {
+		console.error(`The fetch call fail to reach ${url} with the error: ${err.message}`)
+		return null
+	}
+
+	if (response.status >= 400) {
+		console.error(`The ressource at url :${url}, failed to be reach (Reponse code: ${response.status})`)
+		return null
+	} else if (!response.headers.get("Content-Type").includes("text/html")){
+		console.error(`The ressource at url: ${url} couldn't be process. Ressouce is not HTML`)
+		return null
+	}
+
+	console.log(await response.text())
+}
