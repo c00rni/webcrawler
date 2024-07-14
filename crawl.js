@@ -50,8 +50,13 @@ async function crawlPage(baseURL, currentURL, pages) {
 		return pages
 	}
 
-	pages[normalizedCurrentURL] = 1
 	const html = await fetchHTML(normalizedCurrentURL)	
+	
+	if (html == "") {
+		return pages
+	}
+
+	pages[normalizedCurrentURL] = 1
 	const urlsFound = getURLsFromHTML(html, baseURL)
 	for (const url of urlsFound) {
 		pages = await crawlPage(baseURL, url, pages)
@@ -68,14 +73,14 @@ async function fetchHTML(url) {
 			console.error(`Url: ${url} (Reponse code: ${response.status})`)
 			return ""
 		} else if (!response.headers.get("Content-Type").includes("text/html")){
-			console.error(`Url: ${url}. Ressouce is not HTML`)
+			// console.error(`Url: ${url}. Ressouce is not HTML`)
 			return ""
 		}
 	
 		return await response.text()
 
 	} catch(err) {
-		console.error(`Url: ${url} fetch fail: ${err.message}`)
+		console.error(`Url: ${url} : ${err.message}`)
 		return ""
 	}
 

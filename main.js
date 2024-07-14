@@ -1,4 +1,5 @@
 import { crawlPage } from "./crawl.js";
+import { printReport, comparePagesFn } from "./report.js";
 async function main() {
 	if (process.argv.length < 3) {
 		console.error('There is not enough arguments.')
@@ -11,9 +12,7 @@ async function main() {
 		console.log('The crawler is starting...')
 		const pages = await crawlPage(url,url,{})
 		
-		for (const page of Object.entries(pages)) {
-			console.log(page)
-		}
+		printReport(Object.entries(pages))
 	}
 }
 

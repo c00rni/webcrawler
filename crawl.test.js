@@ -1,5 +1,6 @@
 import { normalizeURL, getURLsFromHTML } from "./crawl.js";
 import { test, expect } from "@jest/globals";
+import { printReport, comparePagesFn } from "./report.js";
 
 describe('Normalize links', () => {
 
@@ -94,3 +95,36 @@ describe('Extract url from html', () => {
 
 
 });
+
+describe('Sort pages', () => {
+	
+	test('compare by number of references', () => {
+		const pages = [
+			["hello", 1],
+			["hello", 3]
+		]
+		pages.sort(comparePagesFn)
+		expect(pages[0][1]).toEqual(3)
+	});
+
+	test('compare by url if number of references are equal', () => {
+		const pages = [
+			["hello", 3],
+			["hell", 3]
+		]
+		pages.sort(comparePagesFn)
+		expect(pages[0][0]).toEqual("hell")
+	});
+
+	test('compare by references number before url', () => {
+		const pages = [
+			["hella", 1],
+			["hello", 3]
+		]
+		pages.sort(comparePagesFn)
+		expect(pages[0][0]).toEqual("hello")
+	});
+
+
+});
+
